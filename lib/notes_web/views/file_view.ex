@@ -11,9 +11,6 @@ defmodule NotesWeb.FileView do
   end
 
   def render("file.json", %{file: file}) do
-    %{id: file.id,
-      path: file.path,
-      name: file.name,
-      extension: file.extension}
+    %{id: file.id, path: file.path, name: file.name, extension: file.extension, type: "file"}
   end
 end
