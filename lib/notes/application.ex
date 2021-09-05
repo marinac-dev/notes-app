@@ -19,6 +19,9 @@ defmodule Notes.Application do
       # {Notes.Worker, arg}
     ]
 
+    # Ensure that priv/static/uploads exits
+    Notes.Accounts.File.ensure_path()
+
     # See https://hexdocs.pm/elixir/Supervisor.html
     # for other strategies and supported options
     opts = [strategy: :one_for_one, name: Notes.Supervisor]
