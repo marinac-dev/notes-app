@@ -11,8 +11,6 @@ defmodule NotesWeb.UserView do
   end
 
   def render("user.json", %{user: user}) do
-    %{id: user.id,
-      username: user.username,
-      password_hash: user.password_hash}
+    %{type: "user", id: user.id, username: user.username}
   end
 end
