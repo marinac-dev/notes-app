@@ -20,7 +20,7 @@ defmodule Notes.MixProject do
   def application do
     [
       mod: {Notes.Application, []},
-      extra_applications: [:logger, :runtime_tools]
+      extra_applications: [:logger, :runtime_tools, :crypto]
     ]
   end
 
