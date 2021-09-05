@@ -26,7 +26,11 @@ Now you can visit [`localhost:4000`](http://localhost:4000) from your browser.
 
 Ready to run in production? Please [check our deployment guides](https://hexdocs.pm/phoenix/deployment.html).
 
-## ! Note
+## ! Note (bugs)
 
-- Session is vulnerable to token reuse
-- Session paths (sign in/up) is not redirected if authenticated
+- Session is vulnerable to token reuse (requires unique runtime salt)
+- Session paths (sign in/up) is not redirected if authenticated (requires `redirect_if_authenticated`)
+- Does not strictly follow JSON:API standard
+- Error handling is not complete
+- File is physically uploaded when note_id is invalid
+- Auth routes are disabled in test env
