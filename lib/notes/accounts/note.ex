@@ -5,6 +5,7 @@ defmodule Notes.Accounts.Note do
   schema "notes" do
     field :content, :string
     belongs_to :user, Notes.Accounts.User
+    has_many :files, Notes.Accounts.File
 
     timestamps()
   end
