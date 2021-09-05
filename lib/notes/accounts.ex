@@ -168,6 +168,25 @@ defmodule Notes.Accounts do
   def get_note!(id), do: Repo.get!(Note, id)
 
   @doc """
+  If user has note with note_id return it
+
+  Returns nil if the Note does not exist.
+
+  ## Examples
+
+      iex> get_note_owned_by_user(1, 2)
+      %Note{}
+
+      iex> get_note_owned_by_user(456, 2112412)
+      nil
+
+  """
+  def get_note_owned_by_user(user_id, note_id) do
+    query = from n in Note, where: n.user_id == ^user_id and n.id == ^note_id
+    Repo.one(query)
+  end
+
+  @doc """
   Creates a note.
 
   ## Examples
