@@ -1,23 +1,34 @@
 defmodule NotesWeb.FileControllerTest do
   use NotesWeb.ConnCase
 
+  alias File, as: FS
+
+  @create_attrs %{
+    file_content: FS.read!("test/files/water.mp3") |> Base.url_encode64(),
+    name: "the_murmur_of_water",
+    extension: ".mp3",
+    user_id: nil,
+    note_id: nil
+  }
+  @update_attrs %{
+    file_content: FS.read!("test/files/hello.txt") |> Base.url_encode64(),
+    extension: ".txt",
+    name: "hello",
+    user_id: nil,
+    note_id: nil
+  }
+  @invalid_attrs %{extension: nil, name: nil, file_content: nil}
+
+  # Import file later to avoid `File` colision
   alias Notes.Accounts
   alias Notes.Accounts.File
 
-  @create_attrs %{
-    extension: "some extension",
-    name: "some name",
-    path: "some path"
-  }
-  @update_attrs %{
-    extension: "some updated extension",
-    name: "some updated name",
-    path: "some updated path"
-  }
-  @invalid_attrs %{extension: nil, name: nil, path: nil}
-
   def fixture(:file) do
-    {:ok, file} = Accounts.create_file(@create_attrs)
+    {:ok, user} =
+      Accounts.create_user(%{username: "admin", password: "ebjLD3d6$k2h^pAjetXqMKtgW2m$RwV4"})
+
+    {:ok, note} = Accounts.create_note(%{content: "I need to feed my cat!", user_id: user.id})
+    {:ok, file} = Accounts.create_file(%{@create_attrs | user_id: user.id, note_id: note.id})
     file
   end
 
@@ -27,70 +38,89 @@ defmodule NotesWeb.FileControllerTest do
 
   describe "index" do
     test "lists all files", %{conn: conn} do
-      conn = get(conn, Routes.file_path(conn, :index))
+      conn = get(conn, Routes.user_note_file_path(conn, :index, 1, 1))
       assert json_response(conn, 200)["data"] == []
     end
   end
 
   describe "create file" do
     test "renders file when data is valid", %{conn: conn} do
-      conn = post(conn, Routes.file_path(conn, :create), file: @create_attrs)
+      file = fixture(:file)
+      conn = conn |> assign(:user_id, file.user_id)
+
+      conn =
+        post(conn, Routes.user_note_file_path(conn, :create, file.user_id, file.note_id),
+          file: %{@update_attrs | user_id: file.user_id, note_id: file.note_id}
+        )
+
       assert %{"id" => id} = json_response(conn, 201)["data"]
 
-      conn = get(conn, Routes.file_path(conn, :show, id))
+      conn = get(conn, Routes.user_note_file_path(conn, :show, file.user_id, file.note_id, id))
 
       assert %{
-               "id" => id,
-               "extension" => "some extension",
-               "name" => "some name",
-               "path" => "some path"
+               "id" => _id,
+               "extension" => ".txt",
+               "name" => "hello"
              } = json_response(conn, 200)["data"]
     end
 
     test "renders errors when data is invalid", %{conn: conn} do
-      conn = post(conn, Routes.file_path(conn, :create), file: @invalid_attrs)
+      file = fixture(:file)
+      conn = conn |> assign(:user_id, file.user_id)
+
+      conn =
+        post(conn, Routes.user_note_file_path(conn, :create, file.user_id, file.note_id),
+          file: @update_attrs
+        )
+
       assert json_response(conn, 422)["errors"] != %{}
     end
   end
 
   describe "update file" do
-    setup [:create_file]
+    test "renders file when data is valid", %{conn: conn} do
+      %File{id: id} = file = fixture(:file)
 
-    test "renders file when data is valid", %{conn: conn, file: %File{id: id} = file} do
-      conn = put(conn, Routes.file_path(conn, :update, file), file: @update_attrs)
+      conn =
+        put(conn, Routes.user_note_file_path(conn, :update, file.user_id, file.note_id, file),
+          file: %{@update_attrs | user_id: file.user_id, note_id: file.note_id}
+        )
+
       assert %{"id" => ^id} = json_response(conn, 200)["data"]
 
-      conn = get(conn, Routes.file_path(conn, :show, id))
+      conn = get(conn, Routes.user_note_file_path(conn, :show, file.user_id, file.note_id, id))
 
       assert %{
-               "id" => id,
-               "extension" => "some updated extension",
-               "name" => "some updated name",
-               "path" => "some updated path"
+               "id" => _id,
+               "extension" => ".txt",
+               "name" => "hello"
              } = json_response(conn, 200)["data"]
     end
 
-    test "renders errors when data is invalid", %{conn: conn, file: file} do
-      conn = put(conn, Routes.file_path(conn, :update, file), file: @invalid_attrs)
+    test "renders errors when data is invalid", %{conn: conn} do
+      file = fixture(:file)
+
+      conn =
+        put(conn, Routes.user_note_file_path(conn, :update, file.user_id, file.note_id, file),
+          file: @invalid_attrs
+        )
+
       assert json_response(conn, 422)["errors"] != %{}
     end
   end
 
   describe "delete file" do
-    setup [:create_file]
+    test "deletes chosen file", %{conn: conn} do
+      file = fixture(:file)
 
-    test "deletes chosen file", %{conn: conn, file: file} do
-      conn = delete(conn, Routes.file_path(conn, :delete, file))
+      conn =
+        delete(conn, Routes.user_note_file_path(conn, :delete, file.user_id, file.note_id, file))
+
       assert response(conn, 204)
 
       assert_error_sent 404, fn ->
-        get(conn, Routes.file_path(conn, :show, file))
+        get(conn, Routes.user_note_file_path(conn, :show, file.user_id, file.note_id, file))
       end
     end
-  end
-
-  defp create_file(_) do
-    file = fixture(:file)
-    %{file: file}
   end
 end
