@@ -122,4 +122,67 @@ defmodule Notes.AccountsTest do
       assert %Ecto.Changeset{} = Accounts.change_note(note)
     end
   end
+
+  describe "files" do
+    alias Notes.Accounts.File
+
+    @valid_attrs %{extension: "some extension", name: "some name", path: "some path"}
+    @update_attrs %{extension: "some updated extension", name: "some updated name", path: "some updated path"}
+    @invalid_attrs %{extension: nil, name: nil, path: nil}
+
+    def file_fixture(attrs \\ %{}) do
+      {:ok, file} =
+        attrs
+        |> Enum.into(@valid_attrs)
+        |> Accounts.create_file()
+
+      file
+    end
+
+    test "list_files/0 returns all files" do
+      file = file_fixture()
+      assert Accounts.list_files() == [file]
+    end
+
+    test "get_file!/1 returns the file with given id" do
+      file = file_fixture()
+      assert Accounts.get_file!(file.id) == file
+    end
+
+    test "create_file/1 with valid data creates a file" do
+      assert {:ok, %File{} = file} = Accounts.create_file(@valid_attrs)
+      assert file.extension == "some extension"
+      assert file.name == "some name"
+      assert file.path == "some path"
+    end
+
+    test "create_file/1 with invalid data returns error changeset" do
+      assert {:error, %Ecto.Changeset{}} = Accounts.create_file(@invalid_attrs)
+    end
+
+    test "update_file/2 with valid data updates the file" do
+      file = file_fixture()
+      assert {:ok, %File{} = file} = Accounts.update_file(file, @update_attrs)
+      assert file.extension == "some updated extension"
+      assert file.name == "some updated name"
+      assert file.path == "some updated path"
+    end
+
+    test "update_file/2 with invalid data returns error changeset" do
+      file = file_fixture()
+      assert {:error, %Ecto.Changeset{}} = Accounts.update_file(file, @invalid_attrs)
+      assert file == Accounts.get_file!(file.id)
+    end
+
+    test "delete_file/1 deletes the file" do
+      file = file_fixture()
+      assert {:ok, %File{}} = Accounts.delete_file(file)
+      assert_raise Ecto.NoResultsError, fn -> Accounts.get_file!(file.id) end
+    end
+
+    test "change_file/1 returns a file changeset" do
+      file = file_fixture()
+      assert %Ecto.Changeset{} = Accounts.change_file(file)
+    end
+  end
 end
