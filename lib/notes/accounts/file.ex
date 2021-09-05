@@ -51,19 +51,19 @@ defmodule Notes.Accounts.File do
   end
 
   @doc """
-  Accepts a base64 encoded file and uploads it locally.
+  Accepts a URL safe base64 encoded file and uploads it locally.\n
+  Returns {:ok, path} or {:error, reason}
   """
   @spec upload(String.t(), String.t(), String.t()) :: String.t()
   def upload(file_base64, file_name, file_extension) do
     # Decode the file
-    {:ok, file_binary} = Base.decode64(file_base64)
+    {:ok, file_binary} = Base.url_decode64(file_base64)
 
     # Generate a unique filename
     filename = unique_filename({file_name, file_extension})
 
     upload_path = Application.app_dir(:notes, "priv/static/uploads/")
     dest = Path.join([upload_path, filename])
-    IO.inspect([dest, is_binary(file_binary)])
 
     case File.write(dest, file_binary) do
       :ok -> {:ok, dest}
@@ -82,15 +82,14 @@ defmodule Notes.Accounts.File do
     name = get_change(changeset, :name)
     extension = get_change(changeset, :extension)
     content = get_change(changeset, :file_content)
+
     case upload(content, name, extension) do
       {:ok, path} ->
         changeset
         |> put_change(:path, path)
         |> delete_change(:file_content)
 
-      err ->
-        IO.inspect(err)
-
+      _err ->
         changeset
         |> add_error(:unknow, "Unknown error occured")
     end
