@@ -11,11 +11,18 @@ defmodule NotesWeb.FileController do
     render(conn, "index.json", files: files)
   end
 
-  def create(conn, %{"file" => file_params}) do
+  def create(%{assigns: %{user_id: user_id}} = conn, %{
+        "file" => %{"name" => _, "extension" => _, "file_content" => _, "note_id" => _} = params
+      }) do
+    file_params = %{params | "user_id" => user_id}
+
     with {:ok, %File{} = file} <- Accounts.create_file(file_params) do
       conn
       |> put_status(:created)
-      |> put_resp_header("location", Routes.file_path(conn, :show, file))
+      |> put_resp_header(
+        "location",
+        Routes.user_note_file_path(conn, :show, file.user_id, file.note_id, file)
+      )
       |> render("show.json", file: file)
     end
   end
