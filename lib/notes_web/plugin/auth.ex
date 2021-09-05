@@ -2,8 +2,11 @@ defmodule NotesWeb.Plugin.Auth do
   import Plug.Conn
   import Phoenix.Controller
 
+  alias Notes.Accounts
+
   @namespace "user-authorization"
-  @max_age 30 * 24 * 60 * 60
+  # One day - 24h
+  @max_age 60 * 60 * 24
 
   @doc """
   A function plug that ensures that `:user_id` value is present.
@@ -23,16 +26,28 @@ defmodule NotesWeb.Plugin.Auth do
     |> verify_token()
     |> case do
       {:ok, user_id} ->
-        conn
-        |> assign(:user_id, user_id)
+        case Accounts.get_user(user_id) do
+          nil ->
+            conn
+            # Invalid token | missing user
+            |> unauthorized()
+
+          user ->
+            conn
+            |> assign(:user_id, user.id)
+        end
 
       {:error, _} ->
-        conn
-        |> put_status(:unauthorized)
-        |> put_view(NotesWeb.ErrorView)
-        |> render(:"401")
-        |> halt()
+        conn |> unauthorized()
     end
+  end
+
+  defp unauthorized(conn) do
+    conn
+    |> put_status(:unauthorized)
+    |> put_view(NotesWeb.ErrorView)
+    |> render(:"401")
+    |> halt()
   end
 
   @doc """
