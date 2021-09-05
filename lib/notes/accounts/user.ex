@@ -7,7 +7,9 @@ defmodule Notes.Accounts.User do
     field :username, :string
     field :password, :string, virtual: true
     field :password_hash, :string
+
     has_many :notes, Notes.Accounts.Note
+    has_many :files, Notes.Accounts.File
 
     timestamps()
   end
