@@ -74,7 +74,7 @@ Ready to run in production? Please [check our deployment guides](https://hexdocs
     {
       "share": {
         "note_id": 1,
-        "share_id": 1, // This is ID of user you want to share note to
+        "share_id": 1, <<-- This is ID of user you want to share note to
       }
     }
     ```
@@ -95,9 +95,19 @@ Ready to run in production? Please [check our deployment guides](https://hexdocs
   - `GET /api/v1/users/:user_id/notes/:note_id/files` returns list of note's files
   - `GET /api/v1/users/:user_id/notes/:note_id/files/:id` returns specified note file
   - `POST /api/v1/users/:user_id/notes/:note_id/files` uploades file to note
+    - Request body
+    ```json
+    {
+      "file": {
+        "name": "file_name",
+        "extension": ".mp3",
+        "note_id": 42,
+        "file_content": "URL_SAFE_BASE_64_DATA"
+      }
+    }
+    ```
   - `PATCH|PUT /api/v1/users/:user_id/notes/:note_id/files/:id` updates file
   - `DELETE /api/v1/users/:user_id/notes/:note_id/files/:id` deletes file from note
-
 
 ## ! Note (bugs)
 
