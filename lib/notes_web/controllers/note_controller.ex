@@ -23,12 +23,12 @@ defmodule NotesWeb.NoteController do
   end
 
   def show(conn, %{"id" => id}) do
-    note = Accounts.get_note!(id)
+    note = Accounts.get_note_owned_by_user(get_user_id(conn), id)
     render(conn, "show.json", note: note)
   end
 
   def update(conn, %{"id" => id, "note" => note_params}) do
-    note = Accounts.get_note!(id)
+    note = Accounts.get_note_owned_by_user(get_user_id(conn), id)
 
     with {:ok, %Note{} = note} <- Accounts.update_note(note, note_params) do
       render(conn, "show.json", note: note)
@@ -36,10 +36,12 @@ defmodule NotesWeb.NoteController do
   end
 
   def delete(conn, %{"id" => id}) do
-    note = Accounts.get_note!(id)
+    note = Accounts.get_note_owned_by_user(get_user_id(conn), id)
 
     with {:ok, %Note{}} <- Accounts.delete_note(note) do
       send_resp(conn, :no_content, "")
     end
   end
+
+  defp get_user_id(%{assigns: %{user_id: user_id}}), do: user_id
 end
