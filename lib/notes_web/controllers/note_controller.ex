@@ -11,11 +11,13 @@ defmodule NotesWeb.NoteController do
     render(conn, "index.json", notes: notes)
   end
 
-  def create(conn, %{"note" => note_params}) do
+  def create(%{assigns: %{user_id: user_id}} = conn, %{"note" => %{"content" => content}}) do
+    note_params = %{user_id: user_id, content: content}
+
     with {:ok, %Note{} = note} <- Accounts.create_note(note_params) do
       conn
       |> put_status(:created)
-      |> put_resp_header("location", Routes.user_note_path(conn, :show, note))
+      |> put_resp_header("location", Routes.user_note_path(conn, :show, user_id, note))
       |> render("show.json", note: note)
     end
   end
