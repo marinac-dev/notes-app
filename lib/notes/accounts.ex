@@ -374,4 +374,103 @@ defmodule Notes.Accounts do
   def change_file(%File{} = file, attrs \\ %{}) do
     File.changeset(file, attrs)
   end
+
+  alias Notes.Accounts.Share
+
+  @doc """
+  Returns all notes shared with user
+  """
+  def get_shares_for_user(user_id) do
+    query = from s in Share, where: s.share_id == ^user_id, preload: [:owner, note: :files]
+    Repo.all(query)
+  end
+
+  @doc """
+  Returns all share schemas that user has created, preloaded with shared notes and note files.
+  """
+  def get_shares_by_user(user_id) do
+    query = from s in Share, where: s.owner_id == ^user_id, preload: [:owner, note: :files]
+    Repo.all(query)
+  end
+
+  @doc """
+  Gets a single share.
+
+  Raises `Ecto.NoResultsError` if the Share does not exist.
+
+  ## Examples
+
+      iex> get_share!(123)
+      %Share{}
+
+      iex> get_share!(456)
+      ** (Ecto.NoResultsError)
+
+  """
+  def get_share!(id), do: Repo.get!(Share, id)
+
+  @doc """
+  Creates a share.
+
+  ## Examples
+
+      iex> create_share(%{field: value})
+      {:ok, %Share{}}
+
+      iex> create_share(%{field: bad_value})
+      {:error, %Ecto.Changeset{}}
+
+  """
+  def create_share(attrs \\ %{}) do
+    %Share{}
+    |> Share.changeset(attrs)
+    |> Repo.insert()
+  end
+
+  @doc """
+  Updates a share.
+
+  ## Examples
+
+      iex> update_share(share, %{field: new_value})
+      {:ok, %Share{}}
+
+      iex> update_share(share, %{field: bad_value})
+      {:error, %Ecto.Changeset{}}
+
+  """
+  def update_share(%Share{} = share, attrs) do
+    share
+    |> Share.changeset(attrs)
+    |> Repo.update()
+  end
+
+  @doc """
+  Deletes a share.
+
+  ## Examples
+
+      iex> delete_share(share)
+      {:ok, %Share{}}
+
+      iex> delete_share(share)
+      {:error, %Ecto.Changeset{}}
+
+  """
+  def delete_share(%Share{} = share) do
+    Repo.delete(share)
+  end
+
+  @doc """
+  Returns an `%Ecto.Changeset{}` for tracking share changes.
+
+  ## Examples
+
+      iex> change_share(share)
+      %Ecto.Changeset{data: %Share{}}
+
+  """
+  def change_share(%Share{} = share, attrs \\ %{}) do
+    Share.changeset(share, attrs)
+  end
 end

@@ -66,4 +66,93 @@ defmodule Notes.AccountsTest do
       assert %Ecto.Changeset{} = Accounts.change_user(user)
     end
   end
+
+  describe "shares" do
+    alias Notes.Accounts.Share
+
+    @valid_attrs %{
+      note_id: 1,
+      owner_id: 1,
+      share_id: 2
+    }
+    @update_attrs %{
+      note_id: 2,
+      owner_id: 1,
+      share_id: 1
+    }
+    @invalid_attrs %{
+      note_id: nil,
+      owner_id: nil,
+      share_id: nil
+    }
+
+    def user_note_fixture do
+      user_params = %{username: "admin", password: "RaU#ok#fpo5CJRfNzj2r@F8R^KE*P^Y$"}
+      {:ok, user} = Accounts.create_user(user_params)
+      user_params = %{username: "admin2", password: "4CxvzrGt!C2Tkn%ej5vDnuG%mLq&yg6z"}
+      {:ok, user2} = Accounts.create_user(user_params)
+      text = "Non minim amet dolore laborum ex."
+      {:ok, note} = Accounts.create_note(%{user_id: user.id, content: text})
+      {user, user2, note}
+    end
+
+    def share_fixture(attrs \\ %{}) do
+      {u1, u2, n} = user_note_fixture()
+
+      {:ok, share} =
+        attrs
+        |> Enum.into(%{
+          owner_id: u1.id,
+          share_id: u2.id,
+          note_id: n.id
+        })
+        |> Accounts.create_share()
+
+      share
+    end
+
+    test "get_share!/1 returns the share with given id" do
+      share = share_fixture()
+      assert Accounts.get_share!(share.id) == share
+    end
+
+    test "create_share/1 with valid data creates a share" do
+      {u1, u2, n} = user_note_fixture()
+
+      assert {:ok, %Share{} = share} =
+               Accounts.create_share(%{owner_id: u1.id, share_id: u2.id, note_id: n.id})
+    end
+
+    test "create_share/1 with invalid data returns error changeset" do
+      assert {:error, %Ecto.Changeset{}} = Accounts.create_share(@invalid_attrs)
+    end
+
+    test "update_share/2 with valid data updates the share" do
+      share = share_fixture()
+
+      assert {:ok, %Share{} = share} =
+               Accounts.update_share(share, %{
+                 owner_id: share.share_id,
+                 share_id: share.owner_id,
+                 note_id: share.note_id
+               })
+    end
+
+    test "update_share/2 with invalid data returns error changeset" do
+      share = share_fixture()
+      assert {:error, %Ecto.Changeset{}} = Accounts.update_share(share, @invalid_attrs)
+      assert share == Accounts.get_share!(share.id)
+    end
+
+    test "delete_share/1 deletes the share" do
+      share = share_fixture()
+      assert {:ok, %Share{}} = Accounts.delete_share(share)
+      assert_raise Ecto.NoResultsError, fn -> Accounts.get_share!(share.id) end
+    end
+
+    test "change_share/1 returns a share changeset" do
+      share = share_fixture()
+      assert %Ecto.Changeset{} = Accounts.change_share(share)
+    end
+  end
 end
