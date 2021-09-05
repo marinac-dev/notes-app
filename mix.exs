@@ -45,7 +45,8 @@ defmodule Notes.MixProject do
       {:plug_cowboy, "~> 2.0"},
       {:bcrypt_elixir, "~> 2.3"},
       {:excoveralls, "~> 0.14.2"},
-      {:credo, "~> 1.5"}
+      {:credo, "~> 1.5"},
+      {:uuid, "~> 1.1"}
     ]
   end
 
