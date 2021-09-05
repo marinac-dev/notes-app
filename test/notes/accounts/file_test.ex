@@ -1,10 +1,11 @@
 defmodule Notes.Accounts.FileTest do
+  @moduledoc false
   use Notes.DataCase
 
   describe "files" do
     alias Notes.Accounts.File
 
-    def file_fixture() do
+    def file_fixture do
       {:ok, bin} = Elixir.File.read("test/files/water.mp3")
       b64 = bin |> Base.url_encode64()
       name = "the_murmur_of_water"

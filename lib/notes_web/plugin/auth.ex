@@ -1,4 +1,8 @@
 defmodule NotesWeb.Plugin.Auth do
+  @moduledoc """
+  Authentication plug for API\n
+  On every request checks if api_key is valid and assigns user_id
+  """
   import Plug.Conn
   import Phoenix.Controller
 

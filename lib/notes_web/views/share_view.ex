@@ -1,6 +1,6 @@
 defmodule NotesWeb.ShareView do
   use NotesWeb, :view
-  alias NotesWeb.{ShareView, NoteView, UserView}
+  alias NotesWeb.{NoteView, ShareView, UserView}
 
   def render("index.json", %{shares: shares}) do
     %{data: render_many(shares, ShareView, "share.json")}

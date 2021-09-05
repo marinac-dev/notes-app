@@ -1,4 +1,5 @@
 defmodule Notes.Accounts.File do
+  @moduledoc false
   use Ecto.Schema
   import Ecto.Changeset
 
@@ -37,7 +38,7 @@ defmodule Notes.Accounts.File do
   Ensures that /priv/static/uploads exists\n
   The path is used for local file uploads
   """
-  def ensure_path() do
+  def ensure_path do
     with true <- File.exists?("priv"),
          true <- File.exists?("priv/static"),
          true <- File.exists?("priv/static/uploads") do

@@ -1,4 +1,5 @@
 defmodule Notes.Accounts.Note do
+  @moduledoc false
   use Ecto.Schema
   import Ecto.Changeset
 

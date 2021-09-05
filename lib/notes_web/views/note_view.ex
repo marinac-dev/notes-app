@@ -1,6 +1,6 @@
 defmodule NotesWeb.NoteView do
   use NotesWeb, :view
-  alias NotesWeb.{NoteView, FileView}
+  alias NotesWeb.{FileView, NoteView}
 
   def render("index.json", %{notes: notes}) do
     %{data: render_many(notes, NoteView, "note.json")}

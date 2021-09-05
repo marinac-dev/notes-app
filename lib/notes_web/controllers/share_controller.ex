@@ -12,7 +12,7 @@ defmodule NotesWeb.ShareController do
 
   def index(%{assigns: %{user_id: user_id}} = conn, _) do
     shares = Accounts.get_shares_for_user(user_id)
-    IO.inspect(shares)
+
     render(conn, "index.json", shares: shares)
   end
 
