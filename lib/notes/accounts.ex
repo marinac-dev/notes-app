@@ -311,6 +311,26 @@ defmodule Notes.Accounts do
   def get_file!(id), do: Repo.get!(File, id)
 
   @doc """
+  Returns file for given `user_id` (owner), `note_id` and `file_id`
+
+  Retruns nil if the File does not exist.
+
+  ## Examples
+
+      iex> get_user_note_file(123)
+      %File{}
+
+      iex> get_user_note_file(456)
+      nil
+
+  """
+  def get_user_note_file(user_id, note_id, id) do
+    query = from f in File, where: f.id == ^id and f.note_id == ^note_id and f.user_id == ^user_id
+
+    Repo.one(query)
+  end
+
+  @doc """
   Creates a file.
 
   ## Examples
