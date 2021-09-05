@@ -28,7 +28,7 @@ defmodule NotesWeb.FileController do
   end
 
   def show(%{assigns: %{user_id: user_id}} = conn, %{"id" => id, "note_id" => note_id}) do
-    file = Accounts.get_user_note_file(user_id, note_id, id)
+    file = Accounts.get_user_note_file!(user_id, note_id, id)
     render(conn, "show.json", file: file)
   end
 
@@ -37,7 +37,7 @@ defmodule NotesWeb.FileController do
         "note_id" => note_id,
         "file" => file_params
       }) do
-    file = Accounts.get_user_note_file(user_id, note_id, id)
+    file = Accounts.get_user_note_file!(user_id, note_id, id)
 
     with {:ok, %File{} = file} <- Accounts.update_file(file, file_params) do
       render(conn, "show.json", file: file)
@@ -45,7 +45,7 @@ defmodule NotesWeb.FileController do
   end
 
   def delete(%{assigns: %{user_id: user_id}} = conn, %{"id" => id, "note_id" => note_id}) do
-    file = Accounts.get_user_note_file(user_id, note_id, id)
+    file = Accounts.get_user_note_file!(user_id, note_id, id)
 
     with {:ok, %File{}} <- Accounts.delete_file(file) do
       send_resp(conn, :no_content, "")

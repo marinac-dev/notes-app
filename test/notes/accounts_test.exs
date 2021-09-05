@@ -70,16 +70,6 @@ defmodule Notes.AccountsTest do
   describe "shares" do
     alias Notes.Accounts.Share
 
-    @valid_attrs %{
-      note_id: 1,
-      owner_id: 1,
-      share_id: 2
-    }
-    @update_attrs %{
-      note_id: 2,
-      owner_id: 1,
-      share_id: 1
-    }
     @invalid_attrs %{
       note_id: nil,
       owner_id: nil,
@@ -119,7 +109,7 @@ defmodule Notes.AccountsTest do
     test "create_share/1 with valid data creates a share" do
       {u1, u2, n} = user_note_fixture()
 
-      assert {:ok, %Share{} = share} =
+      assert {:ok, %Share{}} =
                Accounts.create_share(%{owner_id: u1.id, share_id: u2.id, note_id: n.id})
     end
 
@@ -130,7 +120,7 @@ defmodule Notes.AccountsTest do
     test "update_share/2 with valid data updates the share" do
       share = share_fixture()
 
-      assert {:ok, %Share{} = share} =
+      assert {:ok, %Share{}} =
                Accounts.update_share(share, %{
                  owner_id: share.share_id,
                  share_id: share.owner_id,

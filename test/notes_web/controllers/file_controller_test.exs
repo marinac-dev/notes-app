@@ -48,20 +48,18 @@ defmodule NotesWeb.FileControllerTest do
       file = fixture(:file)
       conn = conn |> assign(:user_id, file.user_id)
 
-      conn =
-        post(conn, Routes.user_note_file_path(conn, :create, file.user_id, file.note_id),
-          file: %{@update_attrs | user_id: file.user_id, note_id: file.note_id}
-        )
+      conn_post = post(
+        conn,
+        Routes.user_note_file_path(conn, :create, file.user_id, file.note_id),
+        file: %{@update_attrs | user_id: file.user_id, note_id: file.note_id}
+      )
 
-      assert %{"id" => id} = json_response(conn, 201)["data"]
+      assert %{"id" => id} = json_response(conn_post, 201)["data"]
 
-      conn = get(conn, Routes.user_note_file_path(conn, :show, file.user_id, file.note_id, id))
 
-      assert %{
-               "id" => _id,
-               "extension" => ".txt",
-               "name" => "hello"
-             } = json_response(conn, 200)["data"]
+      conn = get(assign(conn, :user_id, file.user_id), Routes.user_note_file_path(conn, :show, file.user_id, file.note_id, id))
+
+      assert %{"id" => _, "extension" => ".txt", "name" => "hello"} = json_response(conn, 200)["data"]
     end
 
     test "renders errors when data is invalid", %{conn: conn} do
@@ -80,13 +78,14 @@ defmodule NotesWeb.FileControllerTest do
   describe "update file" do
     test "renders file when data is valid", %{conn: conn} do
       %File{id: id} = file = fixture(:file)
+      conn = conn |> assign(:user_id, file.user_id)
 
-      conn =
+      conn_put =
         put(conn, Routes.user_note_file_path(conn, :update, file.user_id, file.note_id, file),
           file: %{@update_attrs | user_id: file.user_id, note_id: file.note_id}
         )
 
-      assert %{"id" => ^id} = json_response(conn, 200)["data"]
+      assert %{"id" => ^id} = json_response(conn_put, 200)["data"]
 
       conn = get(conn, Routes.user_note_file_path(conn, :show, file.user_id, file.note_id, id))
 
@@ -99,6 +98,7 @@ defmodule NotesWeb.FileControllerTest do
 
     test "renders errors when data is invalid", %{conn: conn} do
       file = fixture(:file)
+      conn = conn |> assign(:user_id, file.user_id)
 
       conn =
         put(conn, Routes.user_note_file_path(conn, :update, file.user_id, file.note_id, file),
@@ -112,14 +112,15 @@ defmodule NotesWeb.FileControllerTest do
   describe "delete file" do
     test "deletes chosen file", %{conn: conn} do
       file = fixture(:file)
+      conn = conn |> assign(:user_id, file.user_id)
 
-      conn =
-        delete(conn, Routes.user_note_file_path(conn, :delete, file.user_id, file.note_id, file))
+      conn_del =
+        delete(conn, Routes.user_note_file_path(conn, :delete, file.user_id, file.note_id, file.id))
 
-      assert response(conn, 204)
+      assert response(conn_del, 204)
 
       assert_error_sent 404, fn ->
-        get(conn, Routes.user_note_file_path(conn, :show, file.user_id, file.note_id, file))
+        get(conn, Routes.user_note_file_path(conn, :show, file.user_id, file.note_id, file.id))
       end
     end
   end

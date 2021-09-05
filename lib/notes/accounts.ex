@@ -170,7 +170,7 @@ defmodule Notes.Accounts do
   @doc """
   If user has note with note_id return it
 
-  Returns nil if the Note does not exist.
+  Raises `Ecto.NoResultsError` if the Note does not exist.
 
   ## Examples
 
@@ -178,12 +178,12 @@ defmodule Notes.Accounts do
       %Note{}
 
       iex> get_note_owned_by_user(456, 2112412)
-      nil
+      ** (Ecto.NoResultsError)
 
   """
   def get_note_owned_by_user(user_id, note_id) do
-    query = from n in Note, where: n.user_id == ^user_id and n.id == ^note_id
-    Repo.one(query)
+    query = from n in Note, where: n.user_id == ^user_id and n.id == ^note_id, preload: [:files]
+    Repo.one!(query)
   end
 
   @doc """
@@ -313,21 +313,21 @@ defmodule Notes.Accounts do
   @doc """
   Returns file for given `user_id` (owner), `note_id` and `file_id`
 
-  Retruns nil if the File does not exist.
+  Raises `Ecto.NoResultsError if the File does not exist.
 
   ## Examples
 
-      iex> get_user_note_file(123)
+      iex> get_user_note_file!(123)
       %File{}
 
-      iex> get_user_note_file(456)
-      nil
+      iex> get_user_note_file!(456)
+      ** (Ecto.NoResultsError)
 
   """
-  def get_user_note_file(user_id, note_id, id) do
+  def get_user_note_file!(user_id, note_id, id) do
     query = from f in File, where: f.id == ^id and f.note_id == ^note_id and f.user_id == ^user_id
 
-    Repo.one(query)
+    Repo.one!(query)
   end
 
   @doc """
