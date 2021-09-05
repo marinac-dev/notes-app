@@ -6,12 +6,12 @@ defmodule Notes.AccountsTest do
   describe "users" do
     alias Notes.Accounts.User
 
-    @valid_attrs %{password_hash: "some password_hash", username: "some username"}
+    @valid_attrs %{password: "yrwM4Nefq*M4gmWdXv2p7Mfyx4hLU$Ye", username: "super0user"}
     @update_attrs %{
-      password_hash: "some updated password_hash",
-      username: "some updated username"
+      password: "XrwM4Nefq*M4gmWdXv2p7Mfyx4hLU$YA",
+      username: "admin1337"
     }
-    @invalid_attrs %{password_hash: nil, username: nil}
+    @invalid_attrs %{password: nil, username: nil}
 
     def user_fixture(attrs \\ %{}) do
       {:ok, user} =
@@ -34,8 +34,8 @@ defmodule Notes.AccountsTest do
 
     test "create_user/1 with valid data creates a user" do
       assert {:ok, %User{} = user} = Accounts.create_user(@valid_attrs)
-      assert user.password_hash == "some password_hash"
-      assert user.username == "some username"
+      assert User.valid_password?(user, "yrwM4Nefq*M4gmWdXv2p7Mfyx4hLU$Ye")
+      assert user.username == "super0user"
     end
 
     test "create_user/1 with invalid data returns error changeset" do
@@ -45,8 +45,8 @@ defmodule Notes.AccountsTest do
     test "update_user/2 with valid data updates the user" do
       user = user_fixture()
       assert {:ok, %User{} = user} = Accounts.update_user(user, @update_attrs)
-      assert user.password_hash == "some updated password_hash"
-      assert user.username == "some updated username"
+      assert User.valid_password?(user, "XrwM4Nefq*M4gmWdXv2p7Mfyx4hLU$YA")
+      assert user.username == "admin1337"
     end
 
     test "update_user/2 with invalid data returns error changeset" do
