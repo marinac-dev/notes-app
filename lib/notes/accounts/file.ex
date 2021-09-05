@@ -8,6 +8,7 @@ defmodule Notes.Accounts.File do
   @file_limit 1024 * 1024 * 20
   @file_size_error "File to big! Files bigger than 20MB are not allowed"
 
+  @derive {Inspect, except: [:file_content]}
   schema "files" do
     field :name, :string
     field :path, :string
